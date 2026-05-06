@@ -29,5 +29,15 @@ class FolderResponse(Folder):
     pass
     model_config = {"from_attributes": True}
 
-    
-    
+class Documents(BaseModel):
+    id : Optional[int] = None
+    title : str
+    content : str
+    folder_id : int
+    owner_id : Optional[int]
+    created_at : Optional[datetime] = None
+    updated_at : Optional[datetime] = None
+
+class DocResponse(Documents):
+    pass
+    model_config = {"from_attributes": True}
