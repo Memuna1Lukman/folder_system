@@ -1,5 +1,5 @@
 from pydantic import EmailStr,BaseModel
-from typing import Optional
+from typing import Optional,Literal
 from datetime import datetime
 
 class TokenData(BaseModel):
@@ -39,5 +39,16 @@ class Documents(BaseModel):
     updated_at : Optional[datetime] = None
 
 class DocResponse(Documents):
+    pass
+    model_config = {"from_attributes": True}
+
+
+class ShareDoc(BaseModel):
+    id: Optional[int] = None
+    user_id : Optional[int] = None
+    document_id : int
+    access_level : Literal["viewer","editor"]
+
+class ShareDocResponse(ShareDoc):
     pass
     model_config = {"from_attributes": True}
