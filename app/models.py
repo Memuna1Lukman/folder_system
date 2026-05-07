@@ -48,6 +48,8 @@ class Document(Base):
 
 class Permissions(Base):
     __tablename__ = "permissions"
+
+
     id = Column(Integer,primary_key=True)
     user_id = Column(Integer,ForeignKey("users.id",ondelete='CASCADE'),nullable=False)
     document_id = Column(Integer,ForeignKey("documents.id",ondelete='CASCADE'),nullable=False)
