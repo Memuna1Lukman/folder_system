@@ -21,3 +21,10 @@ def sign_up_user (user:schemas.User,db:Session = Depends(get_db)):
     db.refresh(user_dict)
     return user_dict
 
+
+@router.get("/searches/{name}",response_model=schemas.SearchUser)
+def searchUser(user : str,db:Session = Depends(get_db)):
+    users = db.query(models.User).filter(models.User.username.ilike(f"%{name}")).all()
+    return users
+
+

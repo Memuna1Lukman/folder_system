@@ -3,6 +3,8 @@ from ..database import get_db
 from .. import models,schemas,oauth
 from sqlalchemy.orm import Session
 from typing import List
+from sqlalchemy import desc
+
 
 router = APIRouter(
     prefix="/folder",
@@ -74,5 +76,15 @@ def delete_folder(
     db.commit()
     return None              
 
-        
-        
+@router.get("/search/{folder}",response_model=List[schemas.FolderResponse])
+def search_folder(folder:str,db:Session = Depends(get_db),current_user:int=Depends(oauth.get_current_user),limit:int = 10,skip:int=0):
+    query_folder = db.query(models.Folder).filter(
+        models.Folder.owner_id == current_user.id,
+        models.Folder.name.ilike(f"%{folder}%")
+    ).order_by(desc(models.Folder.created_at)).limit(limit).offset(skip).all()
+    if not query_folder:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Folder not found")
+    return query_folder
+
+
+

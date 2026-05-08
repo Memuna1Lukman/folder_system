@@ -19,6 +19,10 @@ class UserResponse(BaseModel):
     is_active : Optional[bool] = None
     model_config = {"from_attributes": True}
 
+class SearchUser(BaseModel):
+    pass
+    model_config = {"from_attributes": True}
+
 class Folder(BaseModel):
     id : Optional[int] = None
     name : str
@@ -52,3 +56,6 @@ class ShareDoc(BaseModel):
 class ShareDocResponse(ShareDoc):
     pass
     model_config = {"from_attributes": True}
+
+
+

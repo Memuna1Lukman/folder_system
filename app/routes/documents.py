@@ -41,14 +41,29 @@ def create_documents(
 @router.get("/",response_model=List[schemas.DocResponse])
 def get_my_docments(
     db:Session = Depends(get_db),
-    current_user:int = Depends(oauth.get_current_user)
+    current_user:int = Depends(oauth.get_current_user),
+    limit: int = 10,
+    skip:int = 0
 ):
-    query_doc = db.query(models.Document).filter(models.Document.owner_id == current_user.id).all()
+    query_doc = db.query(models.Document).filter(models.Document.owner_id == current_user.id).limit(limit).offset(skip).all()
     if not query_doc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="User not found")
     return query_doc
 
-
+@router.get("/search/{title}",response_model=List[schemas.DocResponse])
+def search_document(
+    title:str,
+    db:Session = Depends(get_db),
+    current_user:int = Depends(oauth.get_current_user)
+):
+    query_docs = db.query(models.Document).filter(
+        models.Document.owner_id == current_user.id,
+        models.Document.title.ilike(f"%{title}%")
+    ).all()
+    if not query_docs:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Docuument not available")
+    return query_docs
+    
 
 @router.put("/{id}",response_model=schemas.DocResponse)
 def upd_doc(
