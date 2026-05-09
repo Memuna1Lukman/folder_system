@@ -19,7 +19,7 @@ class UserResponse(BaseModel):
     is_active : Optional[bool] = None
     model_config = {"from_attributes": True}
 
-class SearchUser(BaseModel):
+class SearchUser(UserResponse):
     pass
     model_config = {"from_attributes": True}
 
@@ -38,7 +38,7 @@ class Documents(BaseModel):
     title : str
     content : str
     folder_id : int
-    owner_id : Optional[int]
+    owner_id : Optional[int] = None
     created_at : Optional[datetime] = None
     updated_at : Optional[datetime] = None
 

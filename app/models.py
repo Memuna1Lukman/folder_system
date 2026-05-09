@@ -12,7 +12,7 @@ class User(Base):
     email = Column(String,index=True,unique=True,nullable=False)
     password = Column(String,nullable=False)
     is_active = Column(Boolean,server_default='TRUE',nullable=False)
-    folders = relationship("Folders",back_populates="owner")
+    folders = relationship("Folder",back_populates="owner")
     documents = relationship("Document", back_populates="owner")
     shared_access = relationship("Permissions", back_populates="user")
 
@@ -36,11 +36,11 @@ class Document(Base):
     title = Column(String,index=True,nullable=False)
     content = Column(String,nullable=False)
     folder_id = Column(Integer,ForeignKey("folders.id",ondelete='CASCADE'),nullable=False)
-    folder = relationship("Folders" , back_populates="documents")
+    folder = relationship("Folder" , back_populates="documents")
     owner_id = Column(Integer,ForeignKey("users.id",ondelete='CASCADE'),nullable=False)
     owner = relationship("User", back_populates="documents")
     created_at = Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))  
-    updated_at = Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
+    updated_at = Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'),onupdate=('now()'))
     
     permissions = relationship("Permissions", back_populates="document")
 

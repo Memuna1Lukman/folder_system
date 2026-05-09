@@ -3,7 +3,7 @@ from ..database import get_db
 from .. import models,schemas,oauth
 from sqlalchemy.orm import Session
 from typing import List
-from datetime import datetime
+from datetime import datetime,timezone
 router = APIRouter(
     prefix="/document",
     tags=['Documents']
@@ -14,7 +14,7 @@ router = APIRouter(
 def create_documents(
     doc:schemas.Documents,
     db:Session = Depends(get_db),
-    current_user:int = Depends(oauth.get_current_user)
+    current_user: models.User = Depends(oauth.get_current_user)
 ):
     # Does the folder exist
     # Does the user still exist
@@ -27,11 +27,11 @@ def create_documents(
     #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="User not found")
     query_folder = db.query(models.Folder).filter(models.Folder.id == doc.folder_id).first()
     if not query_folder:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="User not found")
-    if doc.owner_id != current_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"folder with id {doc.folder_id} not found")
+    if query_folder.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Must be an authorized user")
-    doc_dict = doc.dict(exclude={'owner_id'})
-    doc_dict = models.Document(**doc_dict,owner_id = current_user.id)
+    
+    doc_dict = models.Document(title=doc.title,content=doc.content,folder_id=doc.folder_id,owner_id = current_user.id)
     db.add(doc_dict)
     db.commit()
     db.refresh(doc_dict)
@@ -82,11 +82,12 @@ def upd_doc(
     query = query_docs.first()
     if not query:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="User not found")
-    if doc.owner_id != current_user.id:
+    if query.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Must be an authorized user")
     update_data = doc.dict(exclude_unset=True)
-    update_data['updated_at'] = datetime.utcnow()
+    update_data['updated_at'] = datetime.now(timezone.utc)
     query_docs.update(update_data,synchronize_session=False)
     db.commit()
+    db.refresh(query)
     return query
     

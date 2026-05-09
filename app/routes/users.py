@@ -2,7 +2,7 @@ from fastapi import APIRouter,Depends,HTTPException,status
 from ..database import get_db
 from .. import models,schemas,utils
 from sqlalchemy.orm import Session
-
+from typing import List
 
 router = APIRouter(
     prefix="/signup",
@@ -22,9 +22,9 @@ def sign_up_user (user:schemas.User,db:Session = Depends(get_db)):
     return user_dict
 
 
-@router.get("/searches/{name}",response_model=schemas.SearchUser)
-def searchUser(user : str,db:Session = Depends(get_db)):
-    users = db.query(models.User).filter(models.User.username.ilike(f"%{name}")).all()
+@router.get("/searches/{name}",response_model=List[schemas.SearchUser])
+def searchUser(name : str,db:Session = Depends(get_db)):
+    users = db.query(models.User).filter(models.User.username.ilike(f"%{name}%")).all()
     return users
 
 
