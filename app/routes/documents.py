@@ -19,12 +19,7 @@ def create_documents(
     # Does the folder exist
     # Does the user still exist
     #  is the user authorized
-    # query_User = db.query(models.User).filter(
-    #     models.User.id == doc.owner_id,
-    #     models.User.is_active == "True"
-    # ).first()
-    # if not query_User:
-    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="User not found")
+    
     query_folder = db.query(models.Folder).filter(models.Folder.id == doc.folder_id).first()
     if not query_folder:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"folder with id {doc.folder_id} not found")

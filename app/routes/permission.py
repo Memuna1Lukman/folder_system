@@ -79,10 +79,7 @@ def permission(
     db_doc = query_doc.first()
     if not db_doc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Document not exist")
-    # test ownership
-    # query_docperm = db.query(models.Document).filter(
-    #     models.Document.owner_id == current_user.id
-    # ).first()
+    
     is_owner = db_doc.owner_id == current_user.id
     query_perm = db.query(models.Permissions).filter(
         models.Permissions.document_id == id,

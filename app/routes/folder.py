@@ -14,13 +14,7 @@ router = APIRouter(
 
 @router.post("/",status_code=status.HTTP_201_CREATED,response_model=schemas.FolderResponse)
 def create_folder(folder: schemas.Folder,db:Session = Depends(get_db),current_user:int = Depends(oauth.get_current_user)):
-    # query_user = db.query(models.User).filter(models.User.id == folder.owner_id).first()
-    # if not query_user:
-    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"{folder.owner_id} not found")
-    # query_current = db.query(models.Folder).filter(models.Folder.owner_id == current_user.id).first()
-    # if not query_current:
-    #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail=f"You are an authorized user")
-    # add_folder = folder.dict()
+    
     add_folder = models.Folder(owner_id = current_user.id,name= folder.name)
     db.add(add_folder)
     db.commit()
@@ -30,12 +24,9 @@ def create_folder(folder: schemas.Folder,db:Session = Depends(get_db),current_us
 @router.get("/",response_model=List[schemas.FolderResponse])
 def get_my_folders(db:Session= Depends(get_db),current_user:int=Depends(oauth.get_current_user)):
     try:
-        # query_current = db.query(models.User).filter(models.User.id == current_user.id).first()
-        # if not query_current:
-        #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail=f"You are an authorized user")
+       
         query_folder = db.query(models.Folder).filter(models.Folder.owner_id == current_user.id).all()
-        # if query_folder == []:
-        #     raise HTTPException(status_code=status.HTTP_200_OK,detail=[])
+        
         if not query_folder:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail=f"You are an authorized user")
         
@@ -52,13 +43,10 @@ def delete_folder(
     current_user:int = Depends(oauth.get_current_user)
 ):
     try:
-        # query_user = db.query(models.User).filter(models.User.id == current_user.id).first()
-        # if not query_user:
-        #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"{id} not found")
+       
         query_user_folders = db.query(models.Folder).filter(models.Folder.id==id)
         query = query_user_folders.first()
-        # if query == []:
-        #     raise HTTPException(status_code=status.HTTP_200_OK,detail=[])
+       
         if query.owner_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail=f"You are an authorized user")
         if query == None:
